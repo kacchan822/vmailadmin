@@ -1,2 +1,2 @@
 # vmailadmin
-Postfix/Dovecot Virtual Mail User Administoration
+Postfix/Dovocot Virtual Mail User Management System
