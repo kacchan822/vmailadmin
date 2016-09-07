@@ -33,20 +33,19 @@
                 <p>Choose tab which you want to manage.</p>
             </div>
             <div role="tabpanel" class="tab-pane" id="domain">
-                <h2>domain</h2>
-                <a href="#" class="text-success btn btn-default" data-toggle="modal" data-target="#editData">Add</a>
+                <h2>domain
+                <a href="#" class="text-success btn btn-default" data-toggle="modal" data-target="#editData">Add</a></h2>
             </div>
             <div role="tabpanel" class="tab-pane" id="alias">
-                <h2>alias</h2>
-                <a href="#" class="text-success btn btn-default" data-toggle="modal" data-target="#editData">Add</a>
+                <h2>alias
+                <a href="#" class="text-success btn btn-default" data-toggle="modal" data-target="#editData">Add</a></h2>
             </div>
             <div role="tabpanel" class="tab-pane" id="mailbox">
-                <h2>mailbox</h2>
-                <a href="#" class="text-success btn btn-default" data-toggle="modal" data-target="#editData">Add</a>
+                <h2>mailbox
+                <a href="#" class="text-success btn btn-default" data-toggle="modal" data-target="#editData">Add</a></h2>
             </div>
         </div>
     </div><!-- tab -->
-
     <table class="table table-hover">
         <thead>
             <tr id="t_head"></tr>
@@ -68,6 +67,7 @@
             <div class="modal-body">
             </div>
             <div class="modal-footer">
+            <button type="button" class="btn btn-danger pull-left" data-dismiss="modal" id="deleteData_submit">Delete</button>
             <button type="button" class="btn btn-default" data-dismiss="modal" id="editData_close">Close</button>
             <button type="button" class="btn btn-primary" data-dismiss="modal" id="editData_submit">Submit</button>
             </div>

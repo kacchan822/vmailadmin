@@ -14,7 +14,7 @@ from collection_json import Collections
 
 ## bottle settings
 app = application = bottle.Bottle()
-sqlite_plugin = bottle_sqlite.SQLitePlugin(dbfile='mailadmin.db')
+sqlite_plugin = bottle_sqlite.SQLitePlugin(dbfile='mailadmin.db', autocommit=True)
 app.install(sqlite_plugin)
 
 
@@ -116,36 +116,21 @@ def get_jsondata(db, table, domain, data):
     pass
 
 
-@app.route('/json/<table>/<domain>/<data>.json', method='POST')
-def post_jsondata(db, table, domain, data):
+@app.route('/json/<table>/<domain>/<id>.json', method='POST')
+def post_jsondata(db, table, domain, id):
     json_data = bottle.request.json
-    data_dict = { x['name']:x['value'] for x in json_data }
-
-    if data_dict['id']:
-        sql = 'SELECT id FROM {0} WHERE id = ?;'.format(table)
-        c = db.execute(sql, data_dict['id']).fetchone()
-        if c:
-            set_datas = ''
-            for i, j in data_dict.items():
-                set_datas += i + '=\'' + j + '\', '
-            set_datas = set_datas[:-2]
-            sql = 'UPDATE {0} SET {1} WHERE id = ?;'.format(table, set_datas)
-            c = db.execute( sql, data_dict['id'])
-    else:
-        insert_keys = '('
-        insert_values = '('
-        for i, j in data_dict.items():
-            if i == 'id':
-                pass
-            else:
-                insert_keys += i + ', '
-                insert_values += '\'' + j + '\','
-        insert_keys = insert_keys[:-2] + ')'
-        insert_values = insert_values[:-1] + ')'
-        sql = 'INSERT INTO {0} {1} VALUES {2};'.format(table, insert_keys, insert_values)
-        print(sql)
-        c = db.execute(sql)
-
+    keys = []
+    values = []
+    q = []
+    for x in json_data:
+        if x['value']:
+            if x['name'] == 'password':
+                x['value'] = gen_crypt_password(x['value'])
+            keys.append(x['name'])
+            values.append(x['value'])
+            q.append('?')
+    sql = 'REPLACE INTO {0} ({1}) VALUES ({2});'.format(table, ','.join(keys), ','.join(q))
+    db.execute(sql,tuple(values))
     return json_response({'status': 'success', 'uri': '/json/'+table+'.json' }, 200)
 
 
@@ -159,7 +144,7 @@ def delete_data(db, table, domain, id):
         c = db.execute(sql, data_dict['id']).fetchone()
         if c:
             sql = 'DELETE FROM {0} WHERE id = ?;'.format(table)
-            c = db.execute(sql, data_dict['id'])
+            db.execute(sql, data_dict['id'])
     return json_response({'status': 'success', 'uri': '/json/'+table+'.json' }, 200)
 
 

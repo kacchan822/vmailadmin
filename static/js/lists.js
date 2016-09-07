@@ -41,13 +41,23 @@ function dataget(data_uri){
                             $('<a></a>')
                                 .attr('href', itemsArray[i].href)
                                 .html(itemsArray[i].data[j].value)
-                        ).attr('class', 'items_data_name_' + itemsArray[i].data[j].name)
+                        )
+                        .attr('class', 'items_data_name_' + itemsArray[i].data[j].name)
+                        .attr('data-value', itemsArray[i].data[j].value)
+                    );
+                } else if ( itemsArray[i].data[j].name == 'password' ) {
+                    $('#items_row_no_' + i).append(
+                        $('<td></td>')
+                            .html('*******************')
+                            .attr('class', 'items_data_name_' + itemsArray[i].data[j].name)
+                            .attr('data-value', itemsArray[i].data[j].value)
                     );
                 } else {
                     $('#items_row_no_' + i).append(
                         $('<td></td>')
                             .html(itemsArray[i].data[j].value)
                             .attr('class', 'items_data_name_' + itemsArray[i].data[j].name)
+                            .attr('data-value', itemsArray[i].data[j].value)
                     );
                 }
             }
@@ -79,17 +89,18 @@ $('#editData').on('show.bs.modal', function (event) {
 
     if ( row_uri ) {
         modal.find('#editData_submit').attr('data-uri', row_uri);
+        modal.find('#deleteData_submit').attr('data-uri', '/del' + row_uri);
     } else {
         var now_table = $('li.active').find('a').text()
         row_uri = '/json/' + now_table + '/add/add.json'
         modal.find('#editData_submit').attr('data-uri', row_uri);
-    }
+    };
 
     var inputdata = $('#items_row_no_' + rowno );
 
     $("input").each(function(i) {
         var v = inputdata.find('td.items_data_name_' + $(this).attr('name'));
-        $(this).attr('value', v.text());
+        $(this).attr('value', v.attr('data-value'));
         switch ($(this).attr('name')) {
             case 'id':
             case 'local_part':
@@ -98,6 +109,7 @@ $('#editData').on('show.bs.modal', function (event) {
                 break;
             case 'password':
                 $(this).attr('type', 'password');
+                $(this).attr('onClick', 'select()')
         };
     });
 
@@ -105,14 +117,36 @@ $('#editData').on('show.bs.modal', function (event) {
         var username = $(this).val();
         var reg_mail = /([\w.-]+)@([\w.-]+)/;
 
+        if ( username.match(reg_mail) ) {
+            $('#editData_submit').removeAttr('disabled')
+        } else {
+            $('#editData_submit').attr('disabled', 'disabled')
+        };
+
+        $('input#maildir').attr('value', '/home/vmail/' + username.match(reg_mail)[2] + '/' +username.match(reg_mail)[1]) + '/';
         $('input#local_part').attr('value', username.match(reg_mail)[1]);
         $('input#domain_part').attr('value', username.match(reg_mail)[2]);
+    });
+
+    $('input#email').change(function(e) {
+        var email = $(this).val();
+        var reg_mail = /([\w.-]+)@([\w.-]+)/;
+
+        if ( email.match(reg_mail) ) {
+            $('#editData_submit').removeAttr('disabled')
+        } else {
+            $('#editData_submit').attr('disabled', 'disabled')
+        };
     });
 });
 
 
 $('#editData').on('hidden.bs.modal', function (event) {
     $(this).find('form')[0].reset();
+    $('input').each(function(i) {
+        $(this).attr('value', '');
+    });
+    $('#editData_submit').removeAttr('disabled')
 });
 
 
@@ -122,7 +156,7 @@ $('#editData_submit').on('click', function(event) {
     var data_row = {};
 
     // create JSON data
-    $("input").each(function(i) {
+    $('input').each(function(i) {
         data_row = { name: $(this).attr('name'), value: $(this).val() };
         data.push(data_row);
     });
@@ -137,14 +171,48 @@ $('#editData_submit').on('click', function(event) {
         cache: false,
         contentType: 'application/json'
     }).done(function( res ) {
-        alert('success');
+        console.log('success edit')
         $('#t_head').empty();
         $('#t_body').empty();
         $('.modal-body').empty();
         dataget(res['uri']);
     }).fail(function( jqXHR, textStatus, errorThrown ) {
-        alert('failed')
+        console.log('error edit')
     });
+});
+
+
+$('#deleteData_submit').on('click', function(event) {
+    var row_uri = $(this).attr('data-uri');
+    var data = [];
+    var data_row = {};
+
+    // create JSON data
+    $("input").each(function(i) {
+        data_row = { name: $(this).attr('name'), value: $(this).val() };
+        data.push(data_row);
+    });
+
+    var check = confirm('Aer you sure？\n(If you want to delete, click "OK")');
+    if (check == true){
+        // ajax POST
+        $.ajax({
+            url: row_uri,
+            method: 'post',
+            dataType: 'json',
+            data: JSON.stringify(data),
+            cache: false,
+            contentType: 'application/json'
+        }).done(function( res ) {
+            console.log('success delete')
+            $('#t_head').empty();
+            $('#t_body').empty();
+            $('.modal-body').empty();
+            dataget(res['uri']);
+        }).fail(function( jqXHR, textStatus, errorThrown ) {
+            console.log('error delete')
+        });
+    };
 });
 
 
@@ -167,24 +235,24 @@ $('#addData_submit').on('click', function(event) {
         cache: false,
         contentType: 'application/json'
     }).done(function( res ) {
-        alert('success');
+        console.log('success add')
         $('#t_head').empty();
         $('#t_body').empty();
         $('.modal-body').empty();
         dataget(res['uri']);
     }).fail(function( jqXHR, textStatus, errorThrown ) {
-        alert('failed')
+        console.log('error add')
     });
 });
 
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (event) {
-  $('#t_head').empty();
-  $('#t_body').empty();
-  $('.modal-body').empty();
-  if ( $(event.target).text() != 'list index' ){
-      dataget('/json/' + $(event.target).text() + '.json');
-  };
+    $('#t_head').empty();
+    $('#t_body').empty();
+    $('.modal-body').empty();
+    if ( $(event.target).text() != 'list index' ){
+        dataget('/json/' + $(event.target).text() + '.json');
+    };
 });
 
 //end code
