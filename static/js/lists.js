@@ -85,7 +85,7 @@ $('#editData').on('show.bs.modal', function (event) {
     var row_uri = $('#items_row_no_' + rowno).find('a').attr('href');
     var modal = $(this);
 
-    modal.find('.modal-title').text('Edit data for ' + 'id' + ':' + row_data);
+    modal.find('.modal-title').text('Edit data for id:' + row_data);
 
     if ( row_uri ) {
         modal.find('#editData_submit').attr('data-uri', row_uri);
@@ -250,7 +250,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (event) {
     $('#t_head').empty();
     $('#t_body').empty();
     $('.modal-body').empty();
-    if ( $(event.target).text() != 'list index' ){
+    if ( $(event.target).text() !== 'list index' ){
         dataget('/json/' + $(event.target).text() + '.json');
     }
 });
