@@ -22,11 +22,11 @@ function dataget(data_uri){
                         .attr('name', itemsTemplate[i].name)
                     )
                 )
-        };
+        }
 
         for ( var i in itemsTemplate ) {
             $('#t_head').append('<th>' + itemsTemplate[i].name + '</th>');
-        };
+        }
         $('#t_head').append('<th>Action</th>');
 
     	var itemsArray = data.collection.items;
@@ -35,7 +35,7 @@ function dataget(data_uri){
                 $('<tr></tr>').attr('id', 'items_row_no_' + i )
             );
             for (var j in itemsArray[i].data ) {
-                if ( itemsArray[i].data[j].name == 'id' ) {
+                if ( itemsArray[i].data[j].name === 'id' ) {
                     $('#items_row_no_' + i).append(
                         $('<td></td>').append(
                             $('<a></a>')
@@ -45,7 +45,7 @@ function dataget(data_uri){
                         .attr('class', 'items_data_name_' + itemsArray[i].data[j].name)
                         .attr('data-value', itemsArray[i].data[j].value)
                     );
-                } else if ( itemsArray[i].data[j].name == 'password' ) {
+                } else if ( itemsArray[i].data[j].name === 'password' ) {
                     $('#items_row_no_' + i).append(
                         $('<td></td>')
                             .html('*******************')
@@ -72,9 +72,9 @@ function dataget(data_uri){
                         .text('Edit')
                 )
             );
-        };
+        }
     });
-};
+}
 
 
 // Event handlers
@@ -94,7 +94,7 @@ $('#editData').on('show.bs.modal', function (event) {
         var now_table = $('li.active').find('a').text()
         row_uri = '/json/' + now_table + '/add/add.json'
         modal.find('#editData_submit').attr('data-uri', row_uri);
-    };
+    }
 
     var inputdata = $('#items_row_no_' + rowno );
 
@@ -110,7 +110,7 @@ $('#editData').on('show.bs.modal', function (event) {
             case 'password':
                 $(this).attr('type', 'password');
                 $(this).attr('onClick', 'select()')
-        };
+        }
     });
 
     $('input#username').change(function(e) {
@@ -121,7 +121,7 @@ $('#editData').on('show.bs.modal', function (event) {
             $('#editData_submit').removeAttr('disabled')
         } else {
             $('#editData_submit').attr('disabled', 'disabled')
-        };
+        }
 
         $('input#maildir').attr('value', username.match(reg_mail)[2] + '/' + username.match(reg_mail)[1] + '/');
         $('input#local_part').attr('value', username.match(reg_mail)[1]);
@@ -136,7 +136,7 @@ $('#editData').on('show.bs.modal', function (event) {
             $('#editData_submit').removeAttr('disabled')
         } else {
             $('#editData_submit').attr('disabled', 'disabled')
-        };
+        }
     });
 });
 
@@ -194,7 +194,7 @@ $('#deleteData_submit').on('click', function(event) {
     });
 
     var check = confirm('Aer you sure？\n(If you want to delete, click "OK")');
-    if (check == true){
+    if (check === true){
         // ajax POST
         $.ajax({
             url: row_uri,
@@ -212,7 +212,7 @@ $('#deleteData_submit').on('click', function(event) {
         }).fail(function( jqXHR, textStatus, errorThrown ) {
             console.log('error delete')
         });
-    };
+    }
 });
 
 
@@ -252,7 +252,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (event) {
     $('.modal-body').empty();
     if ( $(event.target).text() != 'list index' ){
         dataget('/json/' + $(event.target).text() + '.json');
-    };
+    }
 });
 
 //end code
