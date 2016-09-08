@@ -6,6 +6,7 @@ from hmac import compare_digest
 import smtplib
 from email.mime.text import MIMEText
 import json
+import re
 
 ## bottle modules
 import bottle
@@ -26,6 +27,15 @@ def csrf():
 
 def gen_crypt_password(password):
     crypt_password = crypt(password, mksalt(METHOD_SHA512))
+    return crypt_password
+
+
+def check_password_crypted(password):
+    r = re.compile('^\$(1|5|6)\$[a-zA-Z0-9./]{,16}\$[a-zA-Z0-9./]+')
+    if r.search(password):
+        return password
+    else:
+        crypt_password = crypt(password, mksalt(METHOD_SHA512))
     return crypt_password
 
 
@@ -125,7 +135,7 @@ def post_jsondata(db, table, domain, id):
     for x in json_data:
         if x['value']:
             if x['name'] == 'password':
-                x['value'] = gen_crypt_password(x['value'])
+                x['value'] = check_password_crypted(x['value'])
             keys.append(x['name'])
             values.append(x['value'])
             q.append('?')
