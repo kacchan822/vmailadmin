@@ -123,7 +123,7 @@ $('#editData').on('show.bs.modal', function (event) {
             $('#editData_submit').attr('disabled', 'disabled')
         };
 
-        $('input#maildir').attr('value', '/home/vmail/' + username.match(reg_mail)[2] + '/' +username.match(reg_mail)[1]) + '/';
+        $('input#maildir').attr('value', username.match(reg_mail)[2] + '/' + username.match(reg_mail)[1] + '/');
         $('input#local_part').attr('value', username.match(reg_mail)[1]);
         $('input#domain_part').attr('value', username.match(reg_mail)[2]);
     });
