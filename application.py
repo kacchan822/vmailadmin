@@ -54,51 +54,35 @@ def lists():
     return bottle.template('lists', error=False)
 
 
-@app.route('/json/<table>.json')
+@app.route('/json/<table:re:(domain|alias|mailbox)>.json')
 def get_tabledata(db, table):
-    if table in Collections().formats_dict.keys():
-        res = Collections().get_format(table)
-        sql = "SELECT * FROM " + table
-        c = db.execute(sql)
-        rows = c.fetchall()
-        for row in rows:
-            d = {}
-            if table == 'domain':
-                # d['href'] = '/json/domain/' + row['domain'] + '/domain.json'
-                d['href'] = '/json/domain/' + row['domain'] + '/' + str(row['id']) + '.json'
-            elif table == 'alias':
-                # d['href'] = '/json/alias/' + row['email'].split('@')[1] + '/' + row['email'].replace('@','_') + '.json'
-                d['href'] = '/json/alias/' + row['email'].split('@')[1] + '/' + str(row['id']) + '.json'
-            elif table == 'mailbox':
-                # d['href'] = '/json/mailbox/' + row['domain_part'] + '/' + row['local_part'] + '.json'
-                d['href'] = '/json/mailbox/' + row['domain_part'] + '/' + str(row['id']) + '.json'
-            d['data'] = []
-            datas = Collections().get_template(table)
-            for data in datas:
-                data['value'] = row[data['name']]
-                d['data'].append(data)
-            res['collection']['items'].append(d)
-        error_obj = res['collection']['error']
-        error_obj['title'] = 'Found items'
-        error_obj['code'] = '200'
-        error_obj['message'] = 'Mach the requested table.'
-
-        return json_response(json.dumps(res, indent=4), 200)
-    else:
-        res = Collections().error_data
-        error_obj = res['collection']['error']
-        error_obj['title'] = 'Not Found'
-        error_obj['code'] = '404'
-        error_obj['message'] = 'There is not the requested table.'
-        return json_response(json.dumps(res, indent=4), 404)
+    res = Collections().get_format(table)
+    sql = "SELECT * FROM {0}".format(table)
+    c = db.execute(sql)
+    for row in c.fetchall():
+        d = {}
+        if table == 'domain':
+            domain_name = row['domain']
+        elif table == 'alias':
+            domain_name = row['email'].split('@')[1]
+        elif table == 'mailbox':
+            domain_name = row['domain_part']
+        d['href'] = '/json/{0}/{1}/{2}.json'.format(table, domain_name, row['id'])
+        d['data'] = []
+        datas = Collections().get_template(table)
+        for data in datas:
+            data['value'] = row[data['name']]
+            d['data'].append(data)
+        res['collection']['items'].append(d)
+    return json_response(json.dumps(res, indent=4), 200)
 
 
-@app.route('/json/<table>/<domain>/<data>.json')
+@app.route('/json/<table:re:(domain|alias|mailbox)>/<domain>/<data>.json')
 def get_jsondata(db, table, domain, data):
     pass
 
 
-@app.route('/json/<table>/<domain>/<id>.json', method='POST')
+@app.route('/json/<table:re:(domain|alias|mailbox)>/<domain>/<id>.json', method='POST')
 def post_jsondata(db, table, domain, id):
     json_data = bottle.request.json
     keys = []
@@ -116,7 +100,7 @@ def post_jsondata(db, table, domain, id):
     return json_response({'status': 'success', 'uri': '/json/'+table+'.json' }, 200)
 
 
-@app.route('/del/json/<table>/<domain>/<id>.json', method='POST')
+@app.route('/del/json/<table:re:(domain|alias|mailbox)>/<domain>/<id>.json', method='POST')
 def delete_data(db, table, domain, id):
     json_data = bottle.request.json
     data_dict = {x['name']:x['value'] for x in json_data}
