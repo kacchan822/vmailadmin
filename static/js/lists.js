@@ -7,7 +7,7 @@ function dataget(data_uri){
     $.getJSON( data_uri, function(data){
         var itemsTemplate = data.collection.template.data;
 
-        for ( var i in itemsTemplate ) {
+        for ( var i = 0 ; i < itemsTemplate.length ; i++ ) {
             $('.modal-body').append( $('<div class="form-group"></div>')
                 .append(
                     $('<label></label>')
@@ -24,51 +24,51 @@ function dataget(data_uri){
                 )
         }
 
-        for ( var i in itemsTemplate ) {
-            $('#t_head').append('<th>' + itemsTemplate[i].name + '</th>');
+        for ( var j = 0 ; j < itemsTemplate.length ; j++ ) {
+            $('#t_head').append('<th>' + itemsTemplate[j].name + '</th>');
         }
         $('#t_head').append('<th>Action</th>');
 
     	var itemsArray = data.collection.items;
-        for ( var i in itemsArray ) {
+        for ( var k = 0 ; k < itemsArray.length ; k++ ) {
             $('#t_body').append(
-                $('<tr></tr>').attr('id', 'items_row_no_' + i )
+                $('<tr></tr>').attr('id', 'items_row_no_' + k )
             );
-            for (var j in itemsArray[i].data ) {
-                if ( itemsArray[i].data[j].name === 'id' ) {
-                    $('#items_row_no_' + i).append(
+            for ( var l in itemsArray[k].data ) {
+                if ( itemsArray[k].data[l].name === 'id' ) {
+                    $('#items_row_no_' + k).append(
                         $('<td></td>').append(
                             $('<a></a>')
-                                .attr('href', itemsArray[i].href)
-                                .html(itemsArray[i].data[j].value)
+                                .attr('href', itemsArray[k].href)
+                                .html(itemsArray[k].data[l].value)
                         )
-                        .attr('class', 'items_data_name_' + itemsArray[i].data[j].name)
-                        .attr('data-value', itemsArray[i].data[j].value)
+                        .attr('class', 'items_data_name_' + itemsArray[k].data[l].name)
+                        .attr('data-value', itemsArray[k].data[l].value)
                     );
-                } else if ( itemsArray[i].data[j].name === 'password' ) {
-                    $('#items_row_no_' + i).append(
+                } else if ( itemsArray[k].data[l].name === 'password' ) {
+                    $('#items_row_no_' + k).append(
                         $('<td></td>')
                             .html('*******************')
-                            .attr('class', 'items_data_name_' + itemsArray[i].data[j].name)
-                            .attr('data-value', itemsArray[i].data[j].value)
+                            .attr('class', 'items_data_name_' + itemsArray[k].data[l].name)
+                            .attr('data-value', itemsArray[k].data[l].value)
                     );
                 } else {
-                    $('#items_row_no_' + i).append(
+                    $('#items_row_no_' + k).append(
                         $('<td></td>')
-                            .html(itemsArray[i].data[j].value)
-                            .attr('class', 'items_data_name_' + itemsArray[i].data[j].name)
-                            .attr('data-value', itemsArray[i].data[j].value)
+                            .html(itemsArray[k].data[l].value)
+                            .attr('class', 'items_data_name_' + itemsArray[k].data[l].name)
+                            .attr('data-value', itemsArray[k].data[l].value)
                     );
                 }
             }
-            $('#items_row_no_' + i).append(
+            $('#items_row_no_' + k).append(
                 $('<td></td>').append(
                     $('<a></a>')
                         .attr('href', '#')
                         .attr('class', 'btn btn-default')
                         .attr('data-toggle', 'modal')
                         .attr('data-target', '#editData')
-                        .attr('data-rowno', i)
+                        .attr('data-rowno', k)
                         .text('Edit')
                 )
             );
