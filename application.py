@@ -20,11 +20,6 @@ app.install(sqlite_plugin)
 
 
 ## common functions
-def csrf():
-    csrf_key = 'WW5CRSlFSDZDWklbXmMxRDs6amFlMXIpUS46dz17'
-    return csrf_key
-
-
 def gen_crypt_password(password):
     crypt_password = crypt(password, mksalt(METHOD_SHA512))
     return crypt_password
@@ -35,16 +30,11 @@ def check_password_crypted(password):
     if r.search(password):
         return password
     else:
-        crypt_password = crypt(password, mksalt(METHOD_SHA512))
-    return crypt_password
+        return gen_crypt_password(password)
 
 
 def check_password(plainpass, hashpass):
     return compare_digest(crypt(plainpass, hashpass), hashpass)
-
-
-def loggedin():
-    return bottle.request.get_cookie('loggedin', secret=csrf())
 
 
 def json_response(data, response_code):
@@ -64,26 +54,8 @@ def lists():
     return bottle.template('lists', error=False)
 
 
-@app.route('/login', method='POST')
-def do_login(db):
-    username = bottle.request.forms.get('email')
-    password = bottle.request.forms.get('password')
-    c = db.execute("SELECT password FROM users WHERE email = ?", (username,))
-    row = c.fetchone()
-    if row:
-        hashpass = row['password']
-        if check_password(password, hashpass):
-            bottle.response.set_cookie('loggedin', username, max_age='3600', secret=csrf())
-            return bottle.redirect('/genpass')
-        else:
-            return bottle.template('index', error='パスワードが正しくありません。')
-    else:
-        return bottle.template('index', error=username+'というユーザーは存在しません')
-
-
 @app.route('/json/<table>.json')
 def get_tabledata(db, table):
-    # if loggedin():
     if table in Collections().formats_dict.keys():
         res = Collections().get_format(table)
         sql = "SELECT * FROM " + table
