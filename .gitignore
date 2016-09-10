@@ -87,3 +87,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Sample file and local config file
+vmailadmin_local.db

@@ -7,6 +7,7 @@ import smtplib
 from email.mime.text import MIMEText
 import json
 import re
+import os
 
 ## bottle modules
 import bottle
@@ -15,7 +16,11 @@ from collection_json import Collections
 
 ## bottle settings
 app = application = bottle.Bottle()
-sqlite_plugin = bottle_sqlite.SQLitePlugin(dbfile='mailadmin.db', autocommit=True)
+if os.path.exists('./vmailadmin_local.db'):
+    dbfile = 'vmailadmin_local.db'
+else:
+    dbfile = 'vmailadmin_sample.db'
+sqlite_plugin = bottle_sqlite.SQLitePlugin(dbfile=dbfile, autocommit=True)
 app.install(sqlite_plugin)
 
 
