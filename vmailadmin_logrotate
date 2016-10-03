@@ -1,0 +1,15 @@
+/home/vmailadmin/vmailadmin/logs/*.log
+{
+        rotate 7
+        weekly
+        missingok
+        notifempty
+        dateext
+        delaycompress
+        compress
+        create 0640 vmailadmin vmailadmin
+        su vmailadmin vmailadmin
+        postrotate
+              touch /home/vmailadmin/vmailadmin/tmp/logreopen.trigger
+        endscript
+}
