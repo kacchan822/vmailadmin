@@ -1,0 +1,16 @@
+[Unit]
+Description=vmailadmin powered by uWSGI
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/home/vmailadmin/vmailadmin/tmp/uwsgi.pid
+User=vmailadmin
+Group=vmailadmin
+ExecStart=/home/vmailadmin/vmailadmin/ENV/bin/uwsgi --ini /home/vmailadmin/vmailadmin/uwsgi.ini
+ExecReload=/bin/kill -SIGHUP $MAINPID
+Restart=on-failure
+KillSignal=SIGQUIT
+
+[Install]
+WantedBy=multi-user.target
