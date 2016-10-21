@@ -11,7 +11,7 @@ import os
 
 ## bottle modules
 import bottle
-from plugins import bottle_sqlite
+import bottle_sqlite
 from collection_json import Collections
 
 ## bottle settings
