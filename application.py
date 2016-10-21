@@ -3,6 +3,7 @@
 ## python3 standerd modules
 from crypt import crypt, mksalt, METHOD_MD5, METHOD_SHA256, METHOD_SHA512
 from hmac import compare_digest
+import sqlite3
 import smtplib
 from email.mime.text import MIMEText
 import json
@@ -16,10 +17,10 @@ from collection_json import Collections
 
 ## bottle settings
 app = application = bottle.Bottle()
-if os.path.exists('./vmailadmin_local.db'):
-    dbfile = 'vmailadmin_local.db'
-else:
+if os.getenv('VMAILADMIN_ENV') == 'DEBUG':
     dbfile = 'vmailadmin_sample.db'
+else:
+    dbfile = 'vmailadmin_local.db'
 sqlite_plugin = bottle_sqlite.SQLitePlugin(dbfile=dbfile, autocommit=True)
 app.install(sqlite_plugin)
 
@@ -55,7 +56,40 @@ def home():
     return bottle.redirect('/lists')
 
 @app.route('/lists')
-def lists():
+def lists(db):
+    try:
+        db.execute('SELECT id FROM domain LIMIT 1;')
+    except sqlite3.OperationalError as e:
+        create_alias_table = '''
+            CREATE TABLE alias (
+                id integer primary key,
+                email varchar(255),
+                goto text,
+                active boolean,
+                description text);
+            '''
+        create_domain_table = '''
+            CREATE TABLE domain (
+                id integer primary key,
+                domain varchar(255),
+                tranceport varchar(255),
+                active boolean,
+                description text);
+            '''
+        create_mailbox_table = '''
+            CREATE TABLE mailbox (
+                id integer primary key,
+                username varchar(255),
+                password varchar(255),
+                maildir varchar(255),
+                active boolean,
+                local_part varchar(255),
+                domain_part varchar(255),
+                description text);
+        '''
+        db.execute(create_alias_table)
+        db.execute(create_domain_table)
+        db.execute(create_mailbox_table)
     return bottle.template('lists', error=False)
 
 
