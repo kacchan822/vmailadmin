@@ -146,10 +146,10 @@ def delete_data(db, table, domain, id):
 
     if data_dict['id'] == id:
         sql = 'SELECT id FROM {0} WHERE id = ?;'.format(table)
-        c = db.execute(sql, data_dict['id']).fetchone()
+        c = db.execute(sql, tuple(data_dict['id'])).fetchone()
         if c:
             sql = 'DELETE FROM {0} WHERE id = ?;'.format(table)
-            db.execute(sql, data_dict['id'])
+            db.execute(sql, tuple(data_dict['id']))
     return json_response({'status': 'success', 'uri': '/json/'+table+'.json' }, 200)
 
 
