@@ -130,9 +130,20 @@ $('#editData').on('show.bs.modal', function (event) {
 
     $('input#email').change(function(e) {
         var email = $(this).val();
-        var reg_mail = /([\w.-]+)@([\w.-]+)/;
+        var reg_mail = /([\w.-]+)?@([\w.-]+)/;
 
         if ( email.match(reg_mail) ) {
+            $('#editData_submit').removeAttr('disabled')
+        } else {
+            $('#editData_submit').attr('disabled', 'disabled')
+        }
+    });
+
+    $('input#goto').change(function(e) {
+        var goto = $(this).val();
+        var reg_mail = /([\w.-]+)@([\w.-]+)/;
+
+        if ( goto.match(reg_mail) ) {
             $('#editData_submit').removeAttr('disabled')
         } else {
             $('#editData_submit').attr('disabled', 'disabled')
